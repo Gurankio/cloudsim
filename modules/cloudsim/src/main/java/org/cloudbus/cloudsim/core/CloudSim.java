@@ -60,7 +60,7 @@ public class CloudSim {
 	private static double terminateAt = -1;
 
 	/** The minimal time between events. Events within shorter periods after the last event are discarded. */
-	private static double minTimeBetweenEvents = 0.01;
+	private static double minTimeBetweenEvents = 0;
 	
 	/**
 	 * Initialises all the common attributes.
@@ -152,7 +152,7 @@ public class CloudSim {
 	 * @post $none
 	 */
 	public static void init(int numUser, Calendar cal, boolean traceFlag, double minTimeBetweenEvents) {
-	    if (minTimeBetweenEvents <= 0) {
+		if (minTimeBetweenEvents < 0) {
 		throw new IllegalArgumentException("The minimal time between events should be positive, but is:" + minTimeBetweenEvents);
 	    }
 	    
