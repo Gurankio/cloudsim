@@ -447,14 +447,15 @@ public abstract class SimEntity implements Cloneable {
 	 * @see #processEvent(org.cloudbus.cloudsim.core.SimEvent)
 	 */
 	public void run() {
-		SimEvent ev =  incomingEvents.poll();
-
-		while (ev != null) {
+		SimEvent ev;
+		while ((ev = incomingEvents.poll()) != null) {
 			processEvent(ev);
+			// TODO: This slightly changes the API, subclasses cannot keep references to SimEvents
+			SimEvent.Factory.recycle(ev);
+
 			if (state != EntityStatus.RUNNABLE) {
 				break;
 			}
-			ev = incomingEvents.poll();
 		}
 	}
 

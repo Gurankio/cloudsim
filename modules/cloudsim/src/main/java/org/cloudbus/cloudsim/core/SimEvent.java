@@ -8,19 +8,21 @@
 
 package org.cloudbus.cloudsim.core;
 
+import java.util.concurrent.ArrayBlockingQueue;
+
 /**
  * This class represents a simulation event which is passed between the entities in the simulation.
- * 
+ *
  * @author Costas Simatos
  * @see SimEntity
  */
-public class SimEvent implements Cloneable, Comparable<SimEvent> {
+public final class SimEvent implements Cloneable, Comparable<SimEvent> {
 
 	/** Internal event type. **/
-	private final int etype;
+	private int etype;
 
 	/** The time that this event was scheduled, at which it should occur. **/
-	private final double time;
+	private double time;
 
 	/** Time that the event was removed from the queue to start service. **/
 	private double endWaitingTime;
@@ -32,7 +34,7 @@ public class SimEvent implements Cloneable, Comparable<SimEvent> {
 	private int entDst;
 
 	/** The user defined type of the event. **/
-	private final CloudSimTags tag;
+	private CloudSimTags tag;
 
 	/** 
          * Any data the event is carrying. 
@@ -40,7 +42,7 @@ public class SimEvent implements Cloneable, Comparable<SimEvent> {
          * But this modification would incur several changes in the simulator core
          * that has to be assessed first.
          **/
-	private final Object data;
+	private Object data;
 
         /**
          * An attribute to help CloudSim to identify the order of received events
@@ -64,38 +66,48 @@ public class SimEvent implements Cloneable, Comparable<SimEvent> {
 
 	// ------------------- PACKAGE LEVEL METHODS --------------------------
 	SimEvent(int type, double time, int src, int dest, CloudSimTags tag, Object edata) {
-		etype = type;
-		this.time = time;
-		entSrc = src;
-		entDst = dest;
-		this.tag = tag;
-		data = edata;
-		endWaitingTime = -1.0;
+		this.initialize(type, time, src, dest, tag, edata);
 	}
 
 	SimEvent(int type, double time, int src) {
 		this(type, time, src, src, CloudActionTags.BLANK, null);
 	}
 
-	protected void setSerial(long serial) {
+	private SimEvent() {
+		// Used by the factory below.
+	}
+
+	void setSerial(long serial) {
 		this.serial = serial;
 	}
 
 	/**
-	 * Sets the time that the event was removed from the queue to start service. 
-	 * 
-	 * @param end_waiting_time
+	 * Sets the time that the event was removed from the queue to start service.
 	 */
-	protected void setEndWaitingTime(double end_waiting_time) {
-		endWaitingTime = end_waiting_time;
+	void setEndWaitingTime(double endWaitingTime) {
+		this.endWaitingTime = endWaitingTime;
 	}
-        
-	// ------------------- PUBLIC METHODS --------------------------        
 
+	void initialize(int type, double time, int src, int dest, CloudSimTags tag, Object edata) {
+		this.etype = type;
+		this.time = time;
+		this.entSrc = src;
+		this.entDst = dest;
+		this.tag = tag;
+		this.data = edata;
+		this.endWaitingTime = -1.0;
+	}
+
+	// ------------------- PUBLIC METHODS --------------------------
 	@Override
 	public String toString() {
 		return "Time ="+this.time+", Event tag = " + tag + " source = " + CloudSim.getEntity(entSrc).getName() + " destination = "
 				+ CloudSim.getEntity(entDst).getName();
+	}
+
+	@Override
+	public SimEvent clone() {
+		return Factory.create(etype, time, entSrc, entDst, tag, data);
 	}
 
 	/**
@@ -200,8 +212,26 @@ public class SimEvent implements Cloneable, Comparable<SimEvent> {
 		return data;
 	}
 
-	@Override
-	public Object clone() {
-		return new SimEvent(etype, time, entSrc, entDst, tag, data);
+	static class Factory {
+
+		private static final ArrayBlockingQueue<SimEvent> cache = new ArrayBlockingQueue<>(1024);
+
+		static SimEvent create(int type, double time, int src, int dest, CloudSimTags tag, Object edata) {
+			SimEvent event = cache.poll();
+			if (event == null) {
+				event = new SimEvent();
+			}
+
+			event.initialize(type, time, src, dest, tag, edata);
+			return event;
+		}
+
+		static SimEvent create(int type, double time, int src) {
+			return create(type, time, src, src, CloudActionTags.BLANK, null);
+		}
+
+		static void recycle(SimEvent event) {
+			cache.offer(event);
+		}
 	}
 }

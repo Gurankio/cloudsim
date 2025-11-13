@@ -460,7 +460,7 @@ public class CloudSim {
 		SimEvent evt;
 		if (running) {
 			// Post an event to make this entity
-			evt = new SimEvent(SimEvent.CREATE, clock, 1, 0, CloudActionTags.BLANK, e);
+			evt = SimEvent.Factory.create(SimEvent.CREATE, clock, 1, 0, CloudActionTags.BLANK, e);
 			future.addEvent(evt);
 		}
 		if (e.getId() == -1) { // Only add once!
@@ -529,7 +529,7 @@ public class CloudSim {
 	 * @param delay the delay
 	 */
 	public static void pause(int srcId, double delay) {
-		SimEvent e = new SimEvent(SimEvent.HOLD_DONE, clock + delay, srcId);
+		SimEvent e = SimEvent.Factory.create(SimEvent.HOLD_DONE, clock + delay, srcId);
 		future.addEvent(e);
 		entities.get(srcId).setState(SimEntity.EntityStatus.HOLDING);
 	}
@@ -551,7 +551,7 @@ public class CloudSim {
 			throw new RuntimeException("Send delay can't be infinite.");
 		}
 
-		SimEvent e = new SimEvent(SimEvent.SEND, clock + delay, srcId, dstId, tag, data);
+		SimEvent e = SimEvent.Factory.create(SimEvent.SEND, clock + delay, srcId, dstId, tag, data);
 		future.addEvent(e);
 	}
 
@@ -569,7 +569,7 @@ public class CloudSim {
 			throw new IllegalArgumentException("Send delay can't be negative.");
 		}
 
-		SimEvent e = new SimEvent(SimEvent.SEND, clock + delay, srcId, dstId, tag, data);
+		SimEvent e = SimEvent.Factory.create(SimEvent.SEND, clock + delay, srcId, dstId, tag, data);
 		future.addEventFirst(e);
 	}
 
@@ -655,6 +655,7 @@ public class CloudSim {
 			case SimEvent.ENULL -> throw new IllegalArgumentException("Event has a null type.");
 			case SimEvent.CREATE -> {
 				addEntityDynamically((SimEntity) e.getData());
+				SimEvent.Factory.recycle(e);
 			}
 			case SimEvent.SEND -> {
                 if (destEnt.getState() == SimEntity.EntityStatus.WAITING) { // NOTE: this branch is never used
@@ -667,7 +668,10 @@ public class CloudSim {
                 }
 				destEnt.getIncomingEvents().add(e);
             }
-			case SimEvent.HOLD_DONE -> entities.get(srcId).setState(SimEntity.EntityStatus.RUNNABLE);
+			case SimEvent.HOLD_DONE -> {
+				entities.get(srcId).setState(SimEntity.EntityStatus.RUNNABLE);
+				SimEvent.Factory.recycle(e);
+			}
 			default -> {
 			}
 		}
