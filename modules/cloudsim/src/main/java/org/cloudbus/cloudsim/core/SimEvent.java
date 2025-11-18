@@ -110,19 +110,9 @@ public class SimEvent implements Cloneable, Comparable<SimEvent> {
 
 	@Override
 	public int compareTo(SimEvent event) {
-		if (event == null) {
-			return 1;
-		} else if (time < event.time) {
-			return -1;
-		} else if (time > event.time) {
-			return 1;
-		} else if (serial < event.serial) {
-			return -1;
-		} else if (this == event) {
-			return 0;
-		} else {
-			return 1;
-		}
+		var time_comp = Double.compare(this.time, event.time);
+		if (time_comp != 0) return time_comp;
+		return Long.compare(this.serial, event.serial);
 	}
 
 	/**

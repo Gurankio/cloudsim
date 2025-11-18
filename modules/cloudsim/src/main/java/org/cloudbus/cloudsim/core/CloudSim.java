@@ -8,19 +8,12 @@
 
 package org.cloudbus.cloudsim.core;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.core.predicates.Predicate;
 import org.cloudbus.cloudsim.core.predicates.PredicateAny;
 import org.cloudbus.cloudsim.core.predicates.PredicateNone;
+
+import java.util.*;
 
 /**
  *
@@ -35,6 +28,11 @@ import org.cloudbus.cloudsim.core.predicates.PredicateNone;
  */
 public class CloudSim {
 
+	/**
+	 * The resume event, used to wake up the simulation thread.
+	 */
+	private static final Object pauseObj = new Object();
+
 	/** The Constant CLOUDSIM_VERSION_STRING. */
 	private static final String CLOUDSIM_VERSION_STRING = "7.0";
 
@@ -48,7 +46,7 @@ public class CloudSim {
 	private static CloudInformationService cis = null;
 
 	/** The Constant NOT_FOUND. */
-	private static final int NOT_FOUND = -1;
+	public static final int NOT_FOUND = -1;
 
 	/** The trace flag. */
 	private static boolean traceFlag = false;
@@ -258,13 +256,7 @@ public class CloudSim {
 	 * @post $none
 	 */
 	public static Calendar getSimulationCalendar() {
-		// make a new copy
-		Calendar clone = calendar;
-		if (calendar != null) {
-			clone = (Calendar) calendar.clone();
-		}
-
-		return clone;
+		return calendar != null ? (Calendar) calendar.clone() : null;
 	}
 
 	/**
@@ -339,7 +331,11 @@ public class CloudSim {
 		future = new EventQueue();
 		waitPredicates = new HashMap<>();
 		clock = 0;
+		abruptTerminate = false;
+		terminateAt = -1;
 		running = false;
+		pauseAt = -1;
+		paused = false;
 	}
 
 	// The two standard predicates
@@ -444,8 +440,7 @@ public class CloudSim {
 	public static List<SimEntity> getEntityList() {
 		// create a new list to prevent the user from changing
 		// the list of entities used by Simulation
-		List<SimEntity> list = new LinkedList<>(entities);
-		return list;
+		return new LinkedList<>(entities);
 	}
 
 	// Public update methods
@@ -548,7 +543,7 @@ public class CloudSim {
 			throw new IllegalArgumentException("Send delay can't be negative.");
 		}
 		if(delay >= Double.MAX_VALUE) {
-			throw new RuntimeException("Send delay can't be infinite.");
+			throw new IllegalArgumentException("Send delay can't be infinite.");
 		}
 
 		SimEvent e = new SimEvent(SimEvent.SEND, clock + delay, srcId, dstId, tag, data);
@@ -562,11 +557,13 @@ public class CloudSim {
 	 * @param dstId the dest
 	 * @param delay the delay
 	 * @param tag the tag
-	 * @param data the data
 	 */
 	public static void sendFirst(int srcId, int dstId, double delay, CloudSimTags tag, Object data) {
 		if (delay < 0) {
 			throw new IllegalArgumentException("Send delay can't be negative.");
+		}
+		if (delay >= Double.MAX_VALUE) {
+			throw new IllegalArgumentException("Send delay can't be infinite.");
 		}
 
 		SimEvent e = new SimEvent(SimEvent.SEND, clock + delay, srcId, dstId, tag, data);
@@ -703,8 +700,9 @@ public class CloudSim {
 	 * @return true, if successful otherwise.
 	 */
 	public static boolean pauseSimulation() {
-		paused = true;
-		return paused;
+		synchronized (pauseObj) {
+			return paused = true;
+		}
 	}
 
 	/**
@@ -714,27 +712,34 @@ public class CloudSim {
 	 * @return true, if successful otherwise.
 	 */
 	public static boolean pauseSimulation(long time) {
-		if (time <= clock) {
-			return false;
-		} else {
-			pauseAt = time;
+		synchronized (pauseObj) {
+			if (time <= clock) {
+				return false;
+			} else {
+				pauseAt = time;
+			}
+			return true;
 		}
-		return true;
 	}
 
 	/**
 	 * This method is called if one wants to resume the simulation that has previously been paused.
-	 * 
-	 * @return if the simulation has been restarted or or otherwise.
+	 *
+	 * @return if the simulation has been restarted or otherwise.
 	 */
 	public static boolean resumeSimulation() {
-		paused = false;
+		synchronized (pauseObj) {
+			var wasPaused = paused;
+			paused = false;
 
-		if (pauseAt <= clock) {
-			pauseAt = -1;
+			if (pauseAt <= clock) {
+				pauseAt = -1;
+			}
+
+			pauseObj.notify();
+
+			return !wasPaused;
 		}
-
-		return !paused;
 	}
 
 	/**
@@ -766,11 +771,15 @@ public class CloudSim {
 				clock = pauseAt;
 			}
 
-			while (paused) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+			// Outside the synchronized block to avoid slowing down the main loop.
+			if (paused) {
+				synchronized (pauseObj) {
+					try {
+						while (paused)
+							pauseObj.wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}

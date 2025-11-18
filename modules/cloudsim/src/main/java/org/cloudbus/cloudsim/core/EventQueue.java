@@ -23,6 +23,7 @@ import java.util.PriorityQueue;
 public class EventQueue extends PriorityQueue<SimEvent> {
 	/** A incremental number used for event attribute */
 	private long serial = 0;
+	private long serialFirst = Long.MIN_VALUE;
 
 	/**
 	 * Adds a new event to the queue. Adding a new event to the queue preserves the temporal order of
@@ -41,17 +42,26 @@ public class EventQueue extends PriorityQueue<SimEvent> {
 	 * @param newEvent The event to be put in the queue.
 	 */
 	public void addEventFirst(SimEvent newEvent) {
-		newEvent.setSerial(0);
+		newEvent.setSerial(serialFirst++);
 		this.add(newEvent);
 	}
 
 	@Override
 	public SimEvent poll() {
-		if (!CloudSim.running()) {
-			return null;
-		}
-		return super.poll();
+		return !CloudSim.running() ? null : super.poll();
 	}
+
+	@Override
+	public SimEvent peek() {
+		return !CloudSim.running() ? null : super.peek();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return !CloudSim.running() || super.isEmpty();
+	}
+
+	// TODO: There might be other PriorityQueue methods that need to be overridden to check CloudSim::running
 
 	public void print() {
 		Iterator<SimEvent> iter = iterator();
