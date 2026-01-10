@@ -41,7 +41,7 @@ public class CloudSimExampleTest {
             assertEquals(Cloudlet.CloudletStatus.SUCCESS, cl.getStatus());
             switch (cl.getCloudletId()) {
                 case 0, 1 -> assertEquals(1000, cl.getActualCPUTime(), 0);
-                default -> fail("Unknown cloudlet id");
+				default -> fail("Unknown cloudlet id: " + cl.getCloudletId());
             }
         }
     }
@@ -85,8 +85,8 @@ public class CloudSimExampleTest {
         for (Cloudlet cl : CloudSimExample5.broker2.getCloudletReceivedList()) {
             assertEquals(Cloudlet.CloudletStatus.SUCCESS, cl.getStatus());
             switch (cl.getCloudletId()) {
-                case 0 -> assertEquals(160, cl.getActualCPUTime(), 0);
-                default -> fail("Unknown cloudlet id");
+				case 0, 1 -> assertEquals(160, cl.getActualCPUTime(), 0);
+				default -> fail("Unknown cloudlet id: " + cl.getCloudletId());
             }
         }
     }
@@ -110,7 +110,7 @@ public class CloudSimExampleTest {
         for (Cloudlet cl : CloudSimExample7.broker.getCloudletReceivedList()) {
             assertEquals(Cloudlet.CloudletStatus.SUCCESS, cl.getStatus());
             switch (cl.getCloudletId()) {
-                case 0,5,1,6,2,7,4,9,3,8 -> assertEquals(320, cl.getActualCPUTime(), 0.01);
+				case 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 -> assertEquals(320, cl.getActualCPUTime(), 0.01);
                 default -> fail("Unknown cloudlet id");
             }
         }
@@ -125,7 +125,8 @@ public class CloudSimExampleTest {
         for (Cloudlet cl : clList) {
             assertEquals(Cloudlet.CloudletStatus.SUCCESS, cl.getStatus());
             switch (cl.getCloudletId()) {
-                case 0,5,1,6,2,7,4,9,3,8,101,106,103,108,100,105,102,107,104,109 -> assertEquals(320, cl.getActualCPUTime(), 0);
+				case 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109 ->
+						assertEquals(320, cl.getActualCPUTime(), 0);
                 default -> fail("Unknown cloudlet id");
             }
         }

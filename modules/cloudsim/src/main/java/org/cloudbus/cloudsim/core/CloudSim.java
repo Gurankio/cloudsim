@@ -8,7 +8,9 @@
 
 package org.cloudbus.cloudsim.core;
 
+import org.cloudbus.cloudsim.*;
 import org.cloudbus.cloudsim.Log;
+import org.cloudbus.cloudsim.container.core.Container;
 import org.cloudbus.cloudsim.core.predicates.Predicate;
 import org.cloudbus.cloudsim.core.predicates.PredicateAny;
 import org.cloudbus.cloudsim.core.predicates.PredicateNone;
@@ -336,6 +338,13 @@ public class CloudSim {
 		running = false;
 		pauseAt = -1;
 		paused = false;
+
+		// Also reset the auto-id counters to make assignment reset on a new call to CloudSim::init to mimic old behavior.
+		Cloudlet.initialize();
+		Host.initialize();
+		Pe.initialize();
+		Vm.initialize();
+		Container.initialize();
 	}
 
 	// The two standard predicates

@@ -9,30 +9,17 @@
 
 package org.cloudbus.cloudsim.examples;
 
+import org.cloudbus.cloudsim.*;
+import org.cloudbus.cloudsim.core.CloudSim;
+import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
+import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
+import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
-import org.cloudbus.cloudsim.Datacenter;
-import org.cloudbus.cloudsim.DatacenterBroker;
-import org.cloudbus.cloudsim.DatacenterCharacteristics;
-import org.cloudbus.cloudsim.Host;
-import org.cloudbus.cloudsim.Log;
-import org.cloudbus.cloudsim.Pe;
-import org.cloudbus.cloudsim.Storage;
-import org.cloudbus.cloudsim.UtilizationModel;
-import org.cloudbus.cloudsim.UtilizationModelFull;
-import org.cloudbus.cloudsim.Vm;
-import org.cloudbus.cloudsim.VmAllocationPolicySimple;
-import org.cloudbus.cloudsim.VmSchedulerSpaceShared;
-import org.cloudbus.cloudsim.core.CloudSim;
-import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
-import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
-import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 
 
 /**
@@ -86,7 +73,6 @@ public class CloudSimExample5 {
 			vmlist2 = new ArrayList<>();
 
 			//VM description
-			int vmid = 0;
 			int mips = 250;
 			long size = 10000; //image size (MB)
 			int ram = 512; //vm memory (MB)
@@ -95,10 +81,10 @@ public class CloudSimExample5 {
 			String vmm = "Xen"; //VMM name
 
 			//create two VMs: the first one belongs to user1
-			Vm vm1 = new Vm(vmid, brokerId1, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+			Vm vm1 = new Vm(brokerId1, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
 
 			//the second VM: this one belongs to user2
-			Vm vm2 = new Vm(vmid, brokerId2, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+			Vm vm2 = new Vm(brokerId2, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
 
 			//add the VMs to the vmlists
 			vmlist1.add(vm1);
@@ -113,16 +99,15 @@ public class CloudSimExample5 {
 			cloudletList2 = new ArrayList<>();
 
 			//Cloudlet properties
-			int id = 0;
 			long length = 40000;
 			long fileSize = 300;
 			long outputSize = 300;
 			UtilizationModel utilizationModel = new UtilizationModelFull();
 
-			Cloudlet cloudlet1 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+			Cloudlet cloudlet1 = new Cloudlet(length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
 			cloudlet1.setUserId(brokerId1);
 
-			Cloudlet cloudlet2 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+			Cloudlet cloudlet2 = new Cloudlet(length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
 			cloudlet2.setUserId(brokerId2);
 
 			//add the cloudlets to the lists: each cloudlet belongs to one user
@@ -170,20 +155,17 @@ public class CloudSimExample5 {
 		int mips=1000;
 
 		// 3. Create PEs and add these into a list.
-		peList.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+		peList.add(new Pe(new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
 
 		//4. Create Host with its id and list of PEs and add them to the list of machines
-		int hostId=0;
 		int ram = 2048; //host memory (MB)
 		long storage = 1000000; //host storage
 		int bw = 10000;
-
 
 		//in this example, the VMAllocatonPolicy in use is SpaceShared. It means that only one VM
 		//is allowed to run on each Pe. As each Host has only one Pe, only one VM can run on each Host.
 		hostList.add(
     			new Host(
-    				hostId,
     				new RamProvisionerSimple(ram),
     				new BwProvisionerSimple(bw),
     				storage,

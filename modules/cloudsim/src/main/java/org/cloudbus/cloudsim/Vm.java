@@ -17,6 +17,7 @@ import org.cloudbus.cloudsim.provisioners.RamProvisioner;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Represents a Virtual Machine (VM) that runs inside a Host, sharing a hostList with other VMs. It can have nested
@@ -29,6 +30,18 @@ import java.util.List;
  * @since CloudSim Toolkit 1.0
  */
 public class Vm implements VirtualEntity {
+
+	/**
+	 * The highest id used either automatically or explicitly.
+	 */
+	protected static final AtomicInteger highestId = new AtomicInteger(-1);
+
+	/**
+	 * Initialize the global state.
+	 */
+	public static void initialize() {
+		highestId.set(-1);
+	}
 
 	/** The VM unique id. */
 	private final int id;
@@ -124,7 +137,7 @@ public class Vm implements VirtualEntity {
 
 	/**
 	 * Creates a new Vm object.
-	 * 
+	 *
 	 * @param id unique ID of the VM
 	 * @param userId ID of the VM's owner
 	 * @param mips the mips
@@ -156,6 +169,8 @@ public class Vm implements VirtualEntity {
 			String vmm,
 			CloudletScheduler cloudletScheduler) {
 		this.id = id;
+		highestId.getAndUpdate(x -> Math.max(id, x));
+
 		setUserId(userId);
 		setUid(GuestEntity.getUid(userId, id));
 		setMips(mips);
@@ -223,13 +238,79 @@ public class Vm implements VirtualEntity {
 		if (containerBwProvisioner.getBw() > getBw()) {
 			throw new RuntimeException("bwProvisioner.bw > bw");
 		}
-		
+
 		setGuestScheduler(guestScheduler);
 
 		setPeList(peList);
 		setGuestRamProvisioner(containerRamProvisioner);
 		setGuestBwProvisioner(containerBwProvisioner);
 		setVirtualizationOverhead(0);
+	}
+
+	/**
+	 * Creates a new Vm object with automatic id generation
+	 * 
+	 * @param userId ID of the VM's owner
+	 * @param mips the mips
+	 * @param numberOfPes amount of CPUs
+	 * @param ram amount of ram
+	 * @param bw amount of bandwidth
+	 * @param size The size the VM image size (the amount of storage it will use, at least initially).
+	 * @param vmm virtual machine monitor
+	 * @param cloudletScheduler cloudletScheduler policy for cloudlets scheduling
+	 * @pre id >= 0
+	 * @pre userId >= 0
+	 * @pre size > 0
+	 * @pre ram > 0
+	 * @pre bw > 0
+	 * @pre cpus > 0
+	 * @pre priority >= 0
+	 * @pre cloudletScheduler != null
+	 * @post $none
+	 */
+	public Vm(
+			int userId,
+			double mips,
+			int numberOfPes,
+			int ram,
+			long bw,
+			long size,
+			String vmm,
+			CloudletScheduler cloudletScheduler) {
+		this(highestId.incrementAndGet(), userId, mips, numberOfPes, ram, bw, size, vmm, cloudletScheduler);
+	}
+
+	/**
+	 * Create a new VM object that is capable to host nested guest entities with automatic id generation
+	 *
+	 * @param userId
+	 * @param mips
+	 * @param numberOfPes
+	 * @param ram
+	 * @param bw
+	 * @param size
+	 * @param vmm
+	 * @param cloudletScheduler
+	 * @param guestScheduler
+	 * @param containerRamProvisioner
+	 * @param containerBwProvisioner
+	 * @param peList
+	 */
+	public Vm(
+			int userId,
+			double mips,
+			int numberOfPes,
+			int ram,
+			long bw,
+			long size,
+			String vmm,
+			CloudletScheduler cloudletScheduler,
+			VmScheduler guestScheduler,
+			RamProvisioner containerRamProvisioner,
+			BwProvisioner containerBwProvisioner,
+			List<? extends Pe> peList
+	) {
+		this(highestId.incrementAndGet(), userId, mips, numberOfPes, ram, bw, size, vmm, cloudletScheduler, guestScheduler, containerRamProvisioner, containerBwProvisioner, peList);
 	}
 
 	/**

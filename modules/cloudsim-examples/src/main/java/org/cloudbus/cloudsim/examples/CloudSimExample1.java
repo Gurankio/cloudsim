@@ -9,30 +9,17 @@ package org.cloudbus.cloudsim.examples;
  * Copyright (c) 2009, The University of Melbourne, Australia
  */
 
+import org.cloudbus.cloudsim.*;
+import org.cloudbus.cloudsim.core.CloudSim;
+import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
+import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
+import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
-import org.cloudbus.cloudsim.Datacenter;
-import org.cloudbus.cloudsim.DatacenterBroker;
-import org.cloudbus.cloudsim.DatacenterCharacteristics;
-import org.cloudbus.cloudsim.Host;
-import org.cloudbus.cloudsim.Log;
-import org.cloudbus.cloudsim.Pe;
-import org.cloudbus.cloudsim.Storage;
-import org.cloudbus.cloudsim.UtilizationModel;
-import org.cloudbus.cloudsim.UtilizationModelFull;
-import org.cloudbus.cloudsim.Vm;
-import org.cloudbus.cloudsim.VmAllocationPolicySimple;
-import org.cloudbus.cloudsim.VmSchedulerTimeShared;
-import org.cloudbus.cloudsim.core.CloudSim;
-import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
-import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
-import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 
 /**
  * A simple example showing how to create a data center with one host and run one cloudlet on it.
@@ -86,7 +73,7 @@ public class CloudSimExample1 {
 			Datacenter datacenter0 = createDatacenter("Datacenter_0");
 
 			// Third step: Create Broker
-			broker = new DatacenterBroker("Broker");;
+			broker = new DatacenterBroker("Broker");
 			int brokerId = broker.getId();
 
 			// Fourth step: Create one virtual machine
@@ -169,18 +156,16 @@ public class CloudSimExample1 {
 		int mips = 1000;
 
 		// 3. Create PEs and add these into a list.
-		peList.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+		peList.add(new Pe(new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
 
 		// 4. Create Host with its id and list of PEs and add them to the list
 		// of machines
-		int hostId = 0;
 		int ram = 2048; // host memory (MB)
 		long storage = 1000000; // host storage
 		int bw = 10000;
 
 		hostList.add(
 			new Host(
-				hostId,
 				new RamProvisionerSimple(ram),
 				new BwProvisionerSimple(bw),
 				storage,

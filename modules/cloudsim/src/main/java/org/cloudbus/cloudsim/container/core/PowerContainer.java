@@ -57,6 +57,33 @@ public class PowerContainer extends Container implements PowerGuestEntity {
         }
 
         /**
+		 * Instantiates a new power vm with automatic id generation.
+		 *
+		 * @param id                 the id
+		 * @param userId             the user id
+		 * @param mips               the mips
+		 * @param pesNumber          the pes number
+		 * @param ram                the ram
+		 * @param bw                 the bw
+		 * @param size               the size
+		 * @param vmm                the vmm
+		 * @param cloudletScheduler  the cloudlet scheduler
+		 * @param schedulingInterval the scheduling interval
+		 */
+		public PowerContainer(
+				final int userId,
+				final double mips,
+				final int pesNumber,
+				final int ram,
+				final long bw,
+				final long size,
+				final String vmm,
+				final CloudletScheduler cloudletScheduler,
+				final double schedulingInterval) {
+			this(highestId.incrementAndGet(), userId, mips, pesNumber, ram, bw, size, vmm, cloudletScheduler, schedulingInterval);
+		}
+
+	/**
          * Updates the processing of guest entities running on this VM.
          *
          * @param currentTime current simulation time

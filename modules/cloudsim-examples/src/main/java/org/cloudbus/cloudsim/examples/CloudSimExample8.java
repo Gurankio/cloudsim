@@ -10,26 +10,7 @@
 
 package org.cloudbus.cloudsim.examples;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
-import org.cloudbus.cloudsim.Datacenter;
-import org.cloudbus.cloudsim.DatacenterBroker;
-import org.cloudbus.cloudsim.DatacenterCharacteristics;
-import org.cloudbus.cloudsim.Host;
-import org.cloudbus.cloudsim.Log;
-import org.cloudbus.cloudsim.Pe;
-import org.cloudbus.cloudsim.Storage;
-import org.cloudbus.cloudsim.UtilizationModel;
-import org.cloudbus.cloudsim.UtilizationModelFull;
-import org.cloudbus.cloudsim.Vm;
-import org.cloudbus.cloudsim.VmAllocationPolicySimple;
-import org.cloudbus.cloudsim.VmSchedulerTimeShared;
+import org.cloudbus.cloudsim.*;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.SimEntity;
@@ -37,6 +18,12 @@ import org.cloudbus.cloudsim.core.SimEvent;
 import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * An example showing how to create simulation entities
@@ -185,14 +172,12 @@ public class CloudSimExample8 {
 		peList2.add(new Pe(1, new PeProvisionerSimple(mips)));
 
 		//4. Create Hosts with its id and list of PEs and add them to the list of machines
-		int hostId=0;
 		int ram = 16384; //host memory (MB)
 		long storage = 1000000; //host storage
 		int bw = 10000;
 
 		hostList.add(
     			new Host(
-    				hostId,
     				new RamProvisionerSimple(ram),
     				new BwProvisionerSimple(bw),
     				storage,
@@ -201,11 +186,8 @@ public class CloudSimExample8 {
     			)
     		); // This is our first machine
 
-		hostId++;
-
 		hostList.add(
     			new Host(
-    				hostId,
     				new RamProvisionerSimple(ram),
     				new BwProvisionerSimple(bw),
     				storage,

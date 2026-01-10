@@ -7,19 +7,33 @@
 
 package org.cloudbus.cloudsim.container.core;
 
-import org.cloudbus.cloudsim.*;
+import org.cloudbus.cloudsim.CloudletScheduler;
+import org.cloudbus.cloudsim.VmStateHistoryEntry;
 import org.cloudbus.cloudsim.core.GuestEntity;
 import org.cloudbus.cloudsim.core.HostEntity;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by sareh on 9/07/15.
  * Modified by Remo Andreoli (March 2024)
  */
 public class Container implements GuestEntity {
+
+	/**
+	 * The highest id used either automatically or explicitly.
+	 */
+	protected static final AtomicInteger highestId = new AtomicInteger(-1);
+
+	/**
+	 * Initialize the global state.
+	 */
+	public static void initialize() {
+		highestId.set(-1);
+	}
 
     /** The id. */
     private final int id;
@@ -104,7 +118,8 @@ public class Container implements GuestEntity {
             String containerManager,
             CloudletScheduler containerCloudletScheduler) {
         this.id = id;
-        setUserId(userId);
+		highestId.getAndUpdate(x -> Math.max(id, x));
+		setUserId(userId);
         setUid(GuestEntity.getUid(userId, id));
         setMips(mips);
         setNumberOfPes(numberOfPes);
@@ -120,9 +135,33 @@ public class Container implements GuestEntity {
         setCurrentAllocatedRam(0);
         setCurrentAllocatedSize(0);
         setVirtualizationOverhead(0);
-    }
+	}
 
-    /**
+	/**
+	 * Creates a new Container object with automatic id generation.
+	 *
+	 * @param userId
+	 * @param mips
+	 * @param numberOfPes
+	 * @param ram
+	 * @param bw
+	 * @param size
+	 * @param containerManager
+	 * @param containerCloudletScheduler
+	 */
+	public Container(
+			int userId,
+			double mips,
+			int numberOfPes,
+			int ram,
+			long bw,
+			long size,
+			String containerManager,
+			CloudletScheduler containerCloudletScheduler) {
+		this(highestId.incrementAndGet(), userId, mips, numberOfPes, ram, bw, size, containerManager, containerCloudletScheduler);
+	}
+
+	/**
      * Updates the processing of cloudlets running on this Container.
      *
      * @param currentTime current simulation time

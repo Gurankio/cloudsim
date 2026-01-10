@@ -10,30 +10,17 @@
 package org.cloudbus.cloudsim.examples;
 
 
+import org.cloudbus.cloudsim.*;
+import org.cloudbus.cloudsim.core.CloudSim;
+import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
+import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
+import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
-import org.cloudbus.cloudsim.Datacenter;
-import org.cloudbus.cloudsim.DatacenterBroker;
-import org.cloudbus.cloudsim.DatacenterCharacteristics;
-import org.cloudbus.cloudsim.Host;
-import org.cloudbus.cloudsim.Log;
-import org.cloudbus.cloudsim.Pe;
-import org.cloudbus.cloudsim.Storage;
-import org.cloudbus.cloudsim.UtilizationModel;
-import org.cloudbus.cloudsim.UtilizationModelFull;
-import org.cloudbus.cloudsim.Vm;
-import org.cloudbus.cloudsim.VmAllocationPolicySimple;
-import org.cloudbus.cloudsim.VmSchedulerTimeShared;
-import org.cloudbus.cloudsim.core.CloudSim;
-import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
-import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
-import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 
 
 /**
@@ -75,14 +62,13 @@ public class CloudSimExample2 {
 	            	Datacenter datacenter0 = createDatacenter("Datacenter_0");
 
 	            	//Third step: Create Broker
-	            	broker = new DatacenterBroker("Broker");;
-	            	int brokerId = broker.getId();
+				broker = new DatacenterBroker("Broker");
+				int brokerId = broker.getId();
 
 	            	//Fourth step: Create one virtual machine
 	            	vmlist = new ArrayList<>();
 
 	            	//VM description
-	            	int vmid = 0;
 	            	int mips = 250;
 	            	long size = 10000; //image size (MB)
 	            	int ram = 512; //vm memory (MB)
@@ -91,10 +77,8 @@ public class CloudSimExample2 {
 	            	String vmm = "Xen"; //VMM name
 
 	            	//create two VMs
-	            	Vm vm1 = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
-
-	            	vmid++;
-	            	Vm vm2 = new Vm(vmid, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+				Vm vm1 = new Vm(brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
+				Vm vm2 = new Vm(brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared());
 
 	            	//add the VMs to the vmList
 	            	vmlist.add(vm1);
@@ -103,23 +87,20 @@ public class CloudSimExample2 {
 	            	//submit vm list to the broker
 	            	broker.submitGuestList(vmlist);
 
-
 	            	//Fifth step: Create two Cloudlets
 	            	cloudletList = new ArrayList<>();
 
 	            	//Cloudlet properties
-	            	int id = 0;
 	            	pesNumber=1;
 	            	long length = 250000;
 	            	long fileSize = 300;
 	            	long outputSize = 300;
 	            	UtilizationModel utilizationModel = new UtilizationModelFull();
 
-	            	Cloudlet cloudlet1 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+				Cloudlet cloudlet1 = new Cloudlet(length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
 	            	cloudlet1.setUserId(brokerId);
 
-	            	id++;
-	            	Cloudlet cloudlet2 = new Cloudlet(id, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+				Cloudlet cloudlet2 = new Cloudlet(length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
 	            	cloudlet2.setUserId(brokerId);
 
 	            	//add the cloudlets to the list
@@ -168,17 +149,15 @@ public class CloudSimExample2 {
 	    	int mips = 1000;
 
 	        // 3. Create PEs and add these into a list.
-	    	peList.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+			peList.add(new Pe(new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
 
 	        //4. Create Host with its id and list of PEs and add them to the list of machines
-	        int hostId=0;
 	        int ram = 2048; //host memory (MB)
 	        long storage = 1000000; //host storage
 	        int bw = 10000;
 
 	        hostList.add(
 	    			new Host(
-	    				hostId,
 	    				new RamProvisionerSimple(ram),
 	    				new BwProvisionerSimple(bw),
 	    				storage,

@@ -7,14 +7,15 @@
 
 package org.cloudbus.cloudsim;
 
-import java.util.*;
-
 import org.cloudbus.cloudsim.core.GuestEntity;
 import org.cloudbus.cloudsim.core.HostEntity;
 import org.cloudbus.cloudsim.core.VirtualEntity;
 import org.cloudbus.cloudsim.lists.PeList;
 import org.cloudbus.cloudsim.provisioners.BwProvisioner;
 import org.cloudbus.cloudsim.provisioners.RamProvisioner;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A Host is a Physical Machine (PM) inside a Datacenter. It is also called as a Server.
@@ -28,6 +29,18 @@ import org.cloudbus.cloudsim.provisioners.RamProvisioner;
  * @since CloudSim Toolkit 1.0
  */
 public class Host implements HostEntity {
+
+	/**
+	 * The highest id used either automatically or explicitly.
+	 */
+	protected static final AtomicInteger highestId = new AtomicInteger(-1);
+	
+	/**
+	 * Initialize the global state.
+	 */
+	public static void initialize() {
+		highestId.set(-1);
+	}
 
 	/** The id of the host. */
 	private int id;
@@ -90,6 +103,24 @@ public class Host implements HostEntity {
 		setFailed(false);
 
 		cachedVirtualizationOverhead = new HashMap<>();
+	}
+
+	/**
+	 * Instantiates a new host with automatic id generation.
+	 *
+	 * @param ramProvisioner the ram provisioner
+	 * @param bwProvisioner  the bw provisioner
+	 * @param storage        the storage capacity
+	 * @param peList         the host's PEs list
+	 * @param vmScheduler    the vm scheduler
+	 */
+	public Host(
+			RamProvisioner ramProvisioner,
+			BwProvisioner bwProvisioner,
+			long storage,
+			List<? extends Pe> peList,
+			VmScheduler vmScheduler) {
+		this(highestId.incrementAndGet(), ramProvisioner, bwProvisioner, storage, peList, vmScheduler);
 	}
 
 	/**
@@ -293,6 +324,7 @@ public class Host implements HostEntity {
 	 */
 	protected void setId(int id) {
 		this.id = id;
+		highestId.getAndUpdate(x -> Math.max(id, x));
 	}
 
 	/**

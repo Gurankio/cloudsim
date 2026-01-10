@@ -10,30 +10,17 @@
 
 package org.cloudbus.cloudsim.examples;
 
+import org.cloudbus.cloudsim.*;
+import org.cloudbus.cloudsim.core.CloudSim;
+import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
+import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
+import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.cloudbus.cloudsim.Cloudlet;
-import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
-import org.cloudbus.cloudsim.Datacenter;
-import org.cloudbus.cloudsim.DatacenterBroker;
-import org.cloudbus.cloudsim.DatacenterCharacteristics;
-import org.cloudbus.cloudsim.Host;
-import org.cloudbus.cloudsim.Log;
-import org.cloudbus.cloudsim.Pe;
-import org.cloudbus.cloudsim.Storage;
-import org.cloudbus.cloudsim.UtilizationModel;
-import org.cloudbus.cloudsim.UtilizationModelFull;
-import org.cloudbus.cloudsim.Vm;
-import org.cloudbus.cloudsim.VmAllocationPolicySimple;
-import org.cloudbus.cloudsim.VmSchedulerTimeShared;
-import org.cloudbus.cloudsim.core.CloudSim;
-import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
-import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
-import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 
 /**
  * An example showing how to create
@@ -62,7 +49,7 @@ public class CloudSimExample6 {
 
 		//create VMs
 		for(int i=0;i<vms;i++){
-			list.add(new Vm(i, userId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared()));
+			list.add(new Vm(userId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared()));
 		}
 
 		return list;
@@ -81,7 +68,7 @@ public class CloudSimExample6 {
 		UtilizationModel utilizationModel = new UtilizationModelFull();
 
 		for(int i=0;i<cloudlets;i++){
-			list.add(new Cloudlet(i, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel));
+			list.add(new Cloudlet(length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel));
 			list.getLast().setUserId(userId);
 		}
 
@@ -113,7 +100,7 @@ public class CloudSimExample6 {
 			Datacenter datacenter1 = createDatacenter("Datacenter_1");
 
 			//Third step: Create Broker
-			broker = new DatacenterBroker("Broker");;
+			broker = new DatacenterBroker("Broker");
 			int brokerId = broker.getId();
 
 			//Fourth step: Create VMs and Cloudlets and send them to broker
@@ -170,14 +157,12 @@ public class CloudSimExample6 {
 		peList2.add(new Pe(1, new PeProvisionerSimple(mips)));
 
 		//4. Create Hosts with its id and list of PEs and add them to the list of machines
-		int hostId=0;
 		int ram = 2048; //host memory (MB)
 		long storage = 1000000; //host storage
 		int bw = 10000;
 
 		hostList.add(
     			new Host(
-    				hostId,
     				new RamProvisionerSimple(ram),
     				new BwProvisionerSimple(bw),
     				storage,
@@ -186,11 +171,8 @@ public class CloudSimExample6 {
     			)
     		); // This is our first machine
 
-		hostId++;
-
 		hostList.add(
     			new Host(
-    				hostId,
     				new RamProvisionerSimple(ram),
     				new BwProvisionerSimple(bw),
     				storage,
@@ -203,7 +185,6 @@ public class CloudSimExample6 {
 		//To create a host with a space-shared allocation policy for PEs to VMs:
 		//hostList.add(
     	//		new Host(
-    	//			hostId,
     	//			new CpuProvisionerSimple(peList1),
     	//			new RamProvisionerSimple(ram),
     	//			new BwProvisionerSimple(bw),
@@ -215,7 +196,6 @@ public class CloudSimExample6 {
 		//To create a host with a oportunistic space-shared allocation policy for PEs to VMs:
 		//hostList.add(
     	//		new Host(
-    	//			hostId,
     	//			new CpuProvisionerSimple(peList1),
     	//			new RamProvisionerSimple(ram),
     	//			new BwProvisionerSimple(bw),

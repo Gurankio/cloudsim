@@ -8,16 +8,16 @@
 
 package org.cloudbus.cloudsim;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.core.GuestEntity;
 import org.cloudbus.cloudsim.core.VirtualEntity;
 import org.cloudbus.cloudsim.lists.PeList;
 import org.cloudbus.cloudsim.provisioners.BwProvisioner;
 import org.cloudbus.cloudsim.provisioners.RamProvisioner;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A host supporting dynamic workloads and performance degradation.
@@ -57,6 +57,24 @@ public class HostDynamicWorkload extends Host {
 		super(id, ramProvisioner, bwProvisioner, storage, peList, vmScheduler);
 		setUtilizationMips(0);
 		setPreviousUtilizationMips(0);
+	}
+
+	/**
+	 * Instantiates a new host with automatic id generation.
+	 *
+	 * @param ramProvisioner the ram provisioner
+	 * @param bwProvisioner  the bw provisioner
+	 * @param storage        the storage capacity
+	 * @param peList         the host's PEs list
+	 * @param vmScheduler    the VM scheduler
+	 */
+	public HostDynamicWorkload(
+			RamProvisioner ramProvisioner,
+			BwProvisioner bwProvisioner,
+			long storage,
+			List<? extends Pe> peList,
+			VmScheduler vmScheduler) {
+		this(highestId.incrementAndGet(), ramProvisioner, bwProvisioner, storage, peList, vmScheduler);
 	}
 
 	@Override

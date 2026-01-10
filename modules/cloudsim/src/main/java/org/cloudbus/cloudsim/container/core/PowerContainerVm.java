@@ -68,6 +68,33 @@ public class PowerContainerVm extends ContainerVm implements PowerGuestEntity {
         setSchedulingInterval(schedulingInterval);
     }
 
+	/**
+	 * Instantiates a new power vm with automatic id generation.
+	 *
+	 * @param userId             the user id
+	 * @param mips               the mips
+	 * @param ram                the ram
+	 * @param bw                 the bw
+	 * @param size               the size
+	 * @param vmm                the vmm
+	 * @param containerScheduler the cloudlet scheduler
+	 * @param schedulingInterval the scheduling interval
+	 */
+	public PowerContainerVm(
+			final int userId,
+			final double mips,
+			final int ram,
+			final long bw,
+			final long size,
+			final String vmm,
+			final VmScheduler containerScheduler,
+			final RamProvisioner containerRamProvisioner,
+			final BwProvisioner containerBwProvisioner,
+			List<? extends Pe> peList,
+			final double schedulingInterval) {
+		this(highestId.incrementAndGet(), userId, mips, ram, bw, size, vmm, containerScheduler, containerRamProvisioner, containerBwProvisioner, peList, schedulingInterval);
+	}
+
     /**
      * Updates the processing of cloudlets running on this VM.
      *

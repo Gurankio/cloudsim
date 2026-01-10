@@ -10,6 +10,8 @@ package org.cloudbus.cloudsim;
 
 import org.cloudbus.cloudsim.provisioners.PeProvisioner;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Pe (Processing Element) class represents a CPU core of a physical machine (PM),
  * defined in terms of Millions Instructions Per Second (MIPS) rating.<br/>
@@ -38,6 +40,18 @@ public class Pe {
      * failed because it belongs to a machine which is also failed.
      */
     public static final int FAILED = 3;
+
+	/**
+	 * The highest id used either automatically or explicitly.
+	 */
+	protected static final AtomicInteger highestId = new AtomicInteger(-1);
+
+	/**
+	 * Initialize the global state.
+	 */
+	public static void initialize() {
+		highestId.set(-1);
+	}
 
     /**
      * The Pe id.
@@ -71,14 +85,31 @@ public class Pe {
         status = FREE;
     }
 
-    /**
+	/**
+	 * Instantiates a new Pe object with automatic id generation.
+	 *
+	 * @param peProvisioner the pe provisioner
+	 * @pre peProvisioner != null
+	 * @post $none
+	 */
+	public Pe(PeProvisioner peProvisioner) {
+		this.id = highestId.incrementAndGet();
+		setPeProvisioner(peProvisioner);
+
+		// when created it should be set to FREE, i.e. available for use.
+		status = FREE;
+	}
+
+
+	/**
      * Sets the id.
      *
      * @param id the new id
      */
     protected void setId(int id) {
-        this.id = id;
-    }
+		this.id = id;
+		highestId.getAndUpdate(x -> Math.max(id, x));
+	}
 
     /**
      * Gets the id.

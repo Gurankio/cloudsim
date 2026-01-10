@@ -7,11 +7,12 @@
  */
 package org.cloudbus.cloudsim;
 
+import org.cloudbus.cloudsim.core.CloudSim;
+
 import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.cloudbus.cloudsim.core.CloudSim;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Cloudlet is a user activity to be deployed on a Cloud Resource. It stores, despite all the
@@ -57,6 +58,17 @@ public class Cloudlet {
         // @NOTE: Convert an int to enum with CloudletStatus.values[i] (mind the array bounds)
     }
 
+	/**
+	 * The highest id used either automatically or explicitly.
+	 */
+	protected static final AtomicInteger highestId = new AtomicInteger(-1);
+
+	/**
+	 * Initialize the global state.
+	 */
+	public static void initialize() {
+		highestId.set(-1);
+	}
 
     /**
      * The cloudlet ID.
@@ -270,6 +282,48 @@ public class Cloudlet {
         requiredFiles = new LinkedList<>();
     }
 
+	/**
+	 * Allocates a new Cloudlet object. The Cloudlet length, input and output
+	 * file sizes should be greater than or equal to 1. By default this
+	 * constructor sets the history of this object.
+	 * CloudletID is auto-generated.
+	 *
+	 * @param cloudletLength      the length or size (in MI) of this cloudlet to be
+	 *                            executed in a PowerDatacenter
+	 * @param cloudletFileSize    the file size (in byte) of this cloudlet
+	 *                            <tt>BEFORE</tt> submitting to a Datacenter
+	 * @param cloudletOutputSize  the file size (in byte) of this cloudlet
+	 *                            <tt>AFTER</tt> finish executing by a Datacenter
+	 * @param pesNumber           the pes number
+	 * @param utilizationModelCpu the utilization model of cpu
+	 * @param utilizationModelRam the utilization model of ram
+	 * @param utilizationModelBw  the utilization model of bw
+	 * @pre cloudletID >= 0
+	 * @pre cloudletLength >= 0.0
+	 * @pre cloudletFileSize >= 1
+	 * @pre cloudletOutputSize >= 1
+	 * @post $none
+	 */
+	public Cloudlet(
+			final long cloudletLength,
+			final int pesNumber,
+			final long cloudletFileSize,
+			final long cloudletOutputSize,
+			final UtilizationModel utilizationModelCpu,
+			final UtilizationModel utilizationModelRam,
+			final UtilizationModel utilizationModelBw) {
+		this(
+				highestId.incrementAndGet(),
+				cloudletLength,
+				pesNumber,
+				cloudletFileSize,
+				cloudletOutputSize,
+				utilizationModelCpu,
+				utilizationModelRam,
+				utilizationModelBw
+		);
+    }
+
     /**
      * Allocates a new Cloudlet object. The Cloudlet length, input and output
      * file sizes should be greater than or equal to 1.
@@ -319,6 +373,53 @@ public class Cloudlet {
         costPerBw = 0.0;
 
         requiredFiles = fileList;
+    }
+
+	/**
+	 * Allocates a new Cloudlet object. The Cloudlet length, input and output
+	 * file sizes should be greater than or equal to 1.
+	 * CloudletID is auto-generated.
+	 *
+	 * @param cloudletLength      the length or size (in MI) of this cloudlet to be
+	 *                            executed in a PowerDatacenter
+	 * @param cloudletFileSize    the file size (in byte) of this cloudlet
+	 *                            <tt>BEFORE</tt> submitting to a PowerDatacenter
+	 * @param cloudletOutputSize  the file size (in byte) of this cloudlet
+	 *                            <tt>AFTER</tt> finish executing by a PowerDatacenter
+	 * @param record              record the history of this object or not
+	 * @param fileList            list of files required by this cloudlet
+	 * @param pesNumber           the pes number
+	 * @param utilizationModelCpu the utilization model of cpu
+	 * @param utilizationModelRam the utilization model of ram
+	 * @param utilizationModelBw  the utilization model of bw
+	 * @pre cloudletID >= 0
+	 * @pre cloudletLength >= 0.0
+	 * @pre cloudletFileSize >= 1
+	 * @pre cloudletOutputSize >= 1
+	 * @post $none
+	 */
+	public Cloudlet(
+			final long cloudletLength,
+			final int pesNumber,
+			final long cloudletFileSize,
+			final long cloudletOutputSize,
+			final UtilizationModel utilizationModelCpu,
+			final UtilizationModel utilizationModelRam,
+			final UtilizationModel utilizationModelBw,
+			final boolean record,
+			final List<String> fileList) {
+		this(
+				highestId.incrementAndGet(),
+				cloudletLength,
+				pesNumber,
+				cloudletFileSize,
+				cloudletOutputSize,
+				utilizationModelCpu,
+				utilizationModelRam,
+				utilizationModelBw,
+				record,
+				fileList
+		);
     }
 
     /**
@@ -371,6 +472,52 @@ public class Cloudlet {
         requiredFiles = fileList;
     }
 
+
+	/**
+	 * Allocates a new Cloudlet object. The Cloudlet length, input and output
+	 * file sizes should be greater than or equal to 1.
+	 * By default this constructor sets the history of this object.
+	 * CloudletID is auto-generated.
+	 *
+	 * @param cloudletLength      the length or size (in MI) of this cloudlet to be
+	 *                            executed in a PowerDatacenter
+	 * @param cloudletFileSize    the file size (in byte) of this cloudlet
+	 *                            <tt>BEFORE</tt> submitting to a PowerDatacenter
+	 * @param cloudletOutputSize  the file size (in byte) of this cloudlet
+	 *                            <tt>AFTER</tt> finish executing by a PowerDatacenter
+	 * @param fileList            list of files required by this cloudlet
+	 * @param pesNumber           the pes number
+	 * @param utilizationModelCpu the utilization model of cpu
+	 * @param utilizationModelRam the utilization model of ram
+	 * @param utilizationModelBw  the utilization model of bw
+	 * @pre cloudletID >= 0
+	 * @pre cloudletLength >= 0.0
+	 * @pre cloudletFileSize >= 1
+	 * @pre cloudletOutputSize >= 1
+	 * @post $none
+	 */
+	public Cloudlet(
+			final long cloudletLength,
+			final int pesNumber,
+			final long cloudletFileSize,
+			final long cloudletOutputSize,
+			final UtilizationModel utilizationModelCpu,
+			final UtilizationModel utilizationModelRam,
+			final UtilizationModel utilizationModelBw,
+			final List<String> fileList) {
+		this(
+				highestId.incrementAndGet(),
+				cloudletLength,
+				pesNumber,
+				cloudletFileSize,
+				cloudletOutputSize,
+				utilizationModelCpu,
+				utilizationModelRam,
+				utilizationModelBw,
+				fileList
+		);
+    }
+
     /**
      * Allocates a new Cloudlet object. The Cloudlet length, input and output
      * file sizes should be greater than or equal to 1.
@@ -406,6 +553,7 @@ public class Cloudlet {
         userId = -1;          // to be set by a Broker or user
         status = CloudletStatus.CREATED;
         this.cloudletId = cloudletId;
+		highestId.getAndUpdate(x -> Math.max(cloudletId, x));
         numberOfPes = pesNumber;
 
         execStartTime = 0.0;
@@ -435,6 +583,41 @@ public class Cloudlet {
         setUtilizationModelBw(utilizationModelBw);
         updateUid();
     }
+
+	/**
+	 * Allocates a new Cloudlet object. The Cloudlet length, input and output
+	 * file sizes should be greater than or equal to 1.
+	 * CloudletID is auto-generated.
+	 *
+	 * @param cloudletLength      the length or size (in MI) of this cloudlet to be
+	 *                            executed in a PowerDatacenter
+	 * @param cloudletFileSize    the file size (in byte) of this cloudlet
+	 *                            <tt>BEFORE</tt> submitting to a PowerDatacenter
+	 * @param cloudletOutputSize  the file size (in byte) of this cloudlet
+	 *                            <tt>AFTER</tt> finish executing by a PowerDatacenter
+	 * @param record              record the history of this object or not
+	 * @param pesNumber           the pes number
+	 * @param utilizationModelCpu the utilization model of cpu
+	 * @param utilizationModelRam the utilization model of ram
+	 * @param utilizationModelBw  the utilization model of bw
+	 * @pre cloudletID >= 0
+	 * @pre cloudletLength >= 0.0
+	 * @pre cloudletFileSize >= 1
+	 * @pre cloudletOutputSize >= 1
+	 * @post $none
+	 */
+	public Cloudlet(
+			final long cloudletLength,
+			final int pesNumber,
+			final long cloudletFileSize,
+			final long cloudletOutputSize,
+			final UtilizationModel utilizationModelCpu,
+			final UtilizationModel utilizationModelRam,
+			final UtilizationModel utilizationModelBw,
+			final boolean record) {
+		this(highestId.incrementAndGet(), cloudletLength, pesNumber, cloudletFileSize, cloudletOutputSize, utilizationModelCpu, utilizationModelRam, utilizationModelBw, record);
+    }
+
 
     /** Backward compatibility with ResCloudlet class in CloudSim6G */
     @Deprecated

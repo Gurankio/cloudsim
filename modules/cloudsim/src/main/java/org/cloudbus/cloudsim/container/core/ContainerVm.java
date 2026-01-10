@@ -7,7 +7,9 @@
 
 package org.cloudbus.cloudsim.container.core;
 
-import org.cloudbus.cloudsim.*;
+import org.cloudbus.cloudsim.Pe;
+import org.cloudbus.cloudsim.Vm;
+import org.cloudbus.cloudsim.VmScheduler;
 import org.cloudbus.cloudsim.core.GuestEntity;
 import org.cloudbus.cloudsim.lists.PeList;
 import org.cloudbus.cloudsim.provisioners.BwProvisioner;
@@ -101,6 +103,35 @@ public class ContainerVm extends Vm {
         setGuestBwProvisioner(containerBwProvisioner);
     }
 
+	/**
+	 * Creates a new VMCharacteristics object with automatic id generation.
+	 *
+	 * @param userId
+	 * @param mips
+	 * @param ram
+	 * @param bw
+	 * @param size
+	 * @param vmm
+	 * @param containerScheduler
+	 * @param containerRamProvisioner
+	 * @param containerBwProvisioner
+	 * @param peList
+	 */
+
+	public ContainerVm(
+			int userId,
+			double mips,
+			int ram,
+			long bw,
+			long size,
+			String vmm,
+			VmScheduler containerScheduler,
+			RamProvisioner containerRamProvisioner,
+			BwProvisioner containerBwProvisioner,
+			List<? extends Pe> peList
+	) {
+		this(highestId.incrementAndGet(), userId, mips, ram, bw, size, vmm, containerScheduler, containerRamProvisioner, containerBwProvisioner, peList);
+	}
 
 
     /**

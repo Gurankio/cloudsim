@@ -68,64 +68,57 @@ public class CloudSimExample9 {
 			String vmm = "Xen"; // VMM name
 
 			// create time-sharing VM
-			vmlist.add(new Vm(0, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared()));
+			vmlist.add(new Vm(brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerTimeShared()));
 
 			// create space-sharing VM
-			vmlist.add(new Vm(1, brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared()));
+			vmlist.add(new Vm(brokerId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared()));
 
 			// submit vm list to the broker
 			broker.submitGuestList(vmlist);
 
-
 			cloudletList = new ArrayList<>();
 
 			// Cloudlet properties
-			int id = 0;
 			long fileSize = 300;
 			long outputSize = 300;
 			UtilizationModel utilizationModel = new UtilizationModelFull();
 
-			Cloudlet cloudlet1 = new Cloudlet(id, 10000, pesNumber, fileSize,
+			Cloudlet cloudlet1 = new Cloudlet(10000, pesNumber, fileSize,
                                         outputSize, utilizationModel, utilizationModel, 
                                         utilizationModel);
 			cloudlet1.setUserId(brokerId);
 			cloudlet1.setGuestId(0);
 			cloudletList.add(cloudlet1);
-			id++;
 
-			Cloudlet cloudlet2 = new Cloudlet(id, 100000, pesNumber, fileSize,
+			Cloudlet cloudlet2 = new Cloudlet(100000, pesNumber, fileSize,
 					outputSize, utilizationModel, utilizationModel,
 					utilizationModel);
 			cloudlet2.setUserId(brokerId);
 			cloudlet2.setGuestId(0);
 			cloudletList.add(cloudlet2);
-			id++;
 
-			Cloudlet cloudlet3 = new Cloudlet(id, 1000000, pesNumber, fileSize,
+			Cloudlet cloudlet3 = new Cloudlet(1000000, pesNumber, fileSize,
 					outputSize, utilizationModel, utilizationModel,
 					utilizationModel);
 			cloudlet3.setUserId(brokerId);
 			cloudlet3.setGuestId(0);
 			cloudletList.add(cloudlet3);
-			id++;
 
-			Cloudlet cloudlet4 = new Cloudlet(id, 10000, pesNumber, fileSize,
+			Cloudlet cloudlet4 = new Cloudlet(10000, pesNumber, fileSize,
 					outputSize, utilizationModel, utilizationModel,
 					utilizationModel);
 			cloudlet4.setUserId(brokerId);
 			cloudlet4.setGuestId(1);
 			cloudletList.add(cloudlet4);
-			id++;
 
-			Cloudlet cloudlet5 = new Cloudlet(id, 100000, pesNumber, fileSize,
+			Cloudlet cloudlet5 = new Cloudlet(100000, pesNumber, fileSize,
 					outputSize, utilizationModel, utilizationModel,
 					utilizationModel);
 			cloudlet5.setUserId(brokerId);
 			cloudlet5.setGuestId(1);
 			cloudletList.add(cloudlet5);
-			id++;
 
-			Cloudlet cloudlet6 = new Cloudlet(id, 1000000, pesNumber, fileSize,
+			Cloudlet cloudlet6 = new Cloudlet(1000000, pesNumber, fileSize,
 					outputSize, utilizationModel, utilizationModel,
 					utilizationModel);
 			cloudlet6.setUserId(brokerId);
